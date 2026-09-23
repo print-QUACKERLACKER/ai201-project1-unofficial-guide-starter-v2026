@@ -23,6 +23,7 @@ your pipeline, not giving up.
 """
 
 from dataclasses import dataclass
+import re
 
 import config
 from ingest import Document
@@ -97,7 +98,59 @@ def split_documents(documents: list[Document]) -> list[Chunk]:
       - Would splitting on paragraph breaks keep more thoughts intact than
         splitting on a character count?
     """
-    return fallback_split(documents)
+    chunks: list[Chunk] = []
+    chunk_size = config.CHUNK_SIZE
+
+    for doc in documents:
+        paragraphs = [part.strip() for part in re.split(r"\n\s*\n", doc.text) if part.strip()]
+        pieces: list[str] = []
+
+        for paragraph in paragraphs:
+            if len(paragraph) <= chunk_size:
+                pieces.append(paragraph)
+                continue
+
+            sentences = [sentence.strip() for sentence in re.split(r"(?<=[.!?])\s+", paragraph) if sentence.strip()]
+            current = ""
+            for sentence in sentences:
+                candidate = f"{current} {sentence}".strip()
+                if current and len(candidate) > chunk_size:
+                    pieces.append(current)
+                    current = sentence
+                else:
+                    current = candidate
+            if current:
+                pieces.append(current)
+
+        current = ""
+        index = 0
+        for piece in pieces:
+            candidate = f"{current}\n\n{piece}".strip()
+            if current and len(candidate) > chunk_size:
+                chunks.append(
+                    Chunk(
+                        text=current,
+                        source=doc.source,
+                        index=index,
+                        produced_by="chunker.py::split_documents",
+                    )
+                )
+                index += 1
+                current = piece
+            else:
+                current = candidate
+
+        if current:
+            chunks.append(
+                Chunk(
+                    text=current,
+                    source=doc.source,
+                    index=index,
+                    produced_by="chunker.py::split_documents",
+                )
+            )
+
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:

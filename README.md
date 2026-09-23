@@ -1,6 +1,6 @@
 # The Unofficial Guide
 
-<!-- Replace this line with your name and which corpus you picked. -->
+Project 1 submission: campus_life corpus
 
 > **This file is your submission.** Fill it in as you go — most sections get
 > written during the milestone that produces them, not at the end.
@@ -21,76 +21,72 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+This project answers practical questions about student life from the
+campus_life corpus. The corpus contains 88 short posts about courses, housing,
+dining, deadlines, transportation, and campus services. The system loads the
+posts, creates searchable chunks, retrieves the closest evidence, and refuses
+questions that fall outside the corpus. Answers should cite the source files
+used as evidence.
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** 450 characters
+**Overlap:** 0 characters
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
-
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
-
-     Milestone 3. -->
+The documents average about 317 characters and the longest is 549 characters.
+Only 12 documents exceed 400 characters, so 450 keeps the normal one-to-three
+paragraph post together while limiting the longer posts. I chose zero overlap
+because the custom strategy splits at paragraph and sentence boundaries; a
+sliding character overlap would duplicate those boundaries without adding
+useful context.
 
 ## Sample Chunks
 
-<!-- Five chunks, pasted as text. Label each one and name the file it came from
-     AND the function that produced it — the grader checks your code against
-     what you claim here.
+The custom strategy produced 91 chunks from 88 documents.
 
-     `python app.py chunks -n 5` prints all three for you. Copy them straight
-     across.
-
-     Milestone 3. -->
-
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: `admin_withdrawal_deadline.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+Withdrawal is a different thing from dropping and has a different date. Dropping ends at week six. Withdrawal runs to week ten, requires an adviser signature, and puts a W on the transcript that doesn't affect GPA.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+**Chunk 2** — source: `admin_pass_fail_option.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+Any course outside your major can be taken pass/fail, and you can declare it as late as week eight, after you've seen your midterm. A pass needs a C- or better.
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 3** — source: `dining_pellew_dining_hall_followup.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+The wait figure of 12 to 18 minutes at peak matches what I've seen. If you're trying to eat between classes, go before 11:45.
 ```
 
-**Chunk 4** — source: `` — produced by: ``
+**Chunk 4** — source: `housing_innisfree_hall.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+Laundry costs $1.75 wash, $1.75 dry, app-based. On noise: moderate; the building is L-shaped and the short wing is much quieter.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 5** — source: `course_cs_340.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+Expect 6 hours a week early, 15 in the last three weeks when the project lands.
 ```
 
 ## Sample Answer
 
-<!-- One complete question and answer, pasted as text, with the source line
-     visible. Milestone 4. -->
+**Question:** How late can I withdraw from a course, and does it affect my GPA?
 
-**Question:**
-
-**Answer:**
+**Answer:** Withdrawal runs to week ten, requires an adviser signature, and puts
+a W on the transcript that does not affect GPA. Source:
+`admin_withdrawal_deadline.txt`.
 
 ```
 ```
 
-**My relevance cutoff:**
+**My relevance cutoff:** 0.6 initially; this is the starter threshold and still
+needs to be measured against the five covered and five out-of-scope questions.
 
 <!-- The number you set in config.py, and how you got there.
 
@@ -103,7 +99,11 @@
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| Withdrawal deadline and GPA | yes | not measured yet |
+| Pass/fail declaration deadline | yes | not measured yet |
+| Pellew peak wait | yes | not measured yet |
+| Innisfree laundry | yes | not measured yet |
+| CS 340 workload | yes | not measured yet |
 
 ## How I Used AI
 
@@ -118,7 +118,18 @@
 
 **1.**
 
+I used AI to inspect the starter chunker and compare it with the corpus shape.
+The useful observation was that the default produced 88 chunks for 88 short
+documents, but a fixed window could split a longer post mid-word. I used that
+observation to choose paragraph and sentence boundaries instead of copying a
+generic sliding window.
+
 **2.**
+
+I used AI to draft the first five evaluation questions from facts in the
+corpus. I checked each expected phrase against its source document and changed
+the questions to include exact topics and facts, such as "week ten" and
+"12 to 18 minutes," rather than accepting broad questions with no right answer.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
@@ -150,8 +161,8 @@
 | 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
 | 2. Every answer names a source | 5 of 5 |  |  |  |  |
 | 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 4. Chunk boundaries preserve complete thoughts | 4 of 5 | pending | pending | pending | pending |
+| 5. Retrieved source matches answer evidence | 5 of 5 | pending | pending | pending | pending |
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
@@ -173,8 +184,8 @@
 | 1 |  |  |  |
 | 2 |  |  |  |
 | 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 4 | Chunk boundaries preserve complete thoughts | pending | Await chunk sample review. |
+| 5 | Retrieved source matches answer evidence | pending | Await retrieval and answer runs. |
 
 ## Diagnoses
 
@@ -200,7 +211,15 @@
 
 **What I changed:**
 
+I replaced fixed-size fallback windows with `chunker.py::split_documents`,
+which groups paragraphs up to 450 characters and splits oversized paragraphs at
+sentence boundaries.
+
 **Why I picked it:**
+
+The baseline output showed that this corpus is mostly short posts, so preserving
+whole thoughts matters more than adding overlap. The new run has 91 chunks
+instead of 88 while keeping every chunk at or below 450 characters.
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
@@ -215,10 +234,15 @@
 | 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
 | 2. Every answer names a source | 5 of 5 |  |  |  |  |
 | 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 4. Chunk boundaries preserve complete thoughts | 4 of 5 | pending | pending | pending | pending |
+| 5. Retrieved source matches answer evidence | 5 of 5 | pending | pending | pending | pending |
 
 **Did it help?**
+
+The chunking check passed locally: all 91 chunks are at most 450 characters and
+the sample chunks end at readable paragraph or sentence boundaries. Retrieval
+and generation still need an indexed run before criteria 1, 2, 3, and 5 can be
+judged.
 
 <!-- Say plainly whether it did, and how you know. If it made things worse,
      say that — a change that backfired, honestly reported, earns full credit

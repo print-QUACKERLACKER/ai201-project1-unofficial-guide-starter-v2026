@@ -57,6 +57,9 @@ in at least 4 of 5 tries.
 
 ## 4. Something about your chunks
 
+At least 4 of 5 sampled chunks end at a paragraph or sentence boundary, and no
+sample contains a word cut in half.
+
 <!-- YOU WRITE THIS ONE.
 
      How would you know if your chunks were the right size? Name something
@@ -73,11 +76,19 @@ in at least 4 of 5 tries.
 
 **Why this target:**
 
+The campus-life documents are short posts of one to three paragraphs. The
+baseline output showed that a whole post was usually useful context, while
+fixed windows could cut a longer post in the middle of a word. Five samples
+check the common case without pretending to cover all 88 documents.
+
 
 
 ---
 
 ## 5. Your choice
+
+For all 5 covered questions, at least one top-five retrieved chunk comes from
+the document named in the answer's source list.
 
 <!-- YOU WRITE THIS ONE TOO.
 
@@ -90,6 +101,11 @@ in at least 4 of 5 tries.
 
 
 **Why this target:**
+
+The corpus contains several near-duplicate follow-up posts, especially for
+dining and housing. Checking the actual source file, rather than only checking
+that some source name appears, tests whether retrieval found the evidence used
+to answer the question.
 
 
 
